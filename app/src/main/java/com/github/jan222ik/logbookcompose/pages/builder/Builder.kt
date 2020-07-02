@@ -285,30 +285,40 @@ fun createBuilderTreeFromModule(
                             is UIModule.Value.Date -> {
                                 Text(text = "Date Formats")
                                 val dateFormatOptions = DateFormat.values().map { it.name }
-                                val (selectedDateFormat, onDateFormatSelected) = state { dateFormatOptions[dateFormatOptions.indexOf(modState.format.name)] }
+                                val (selectedDateFormat, onDateFormatSelected) = state {
+                                    dateFormatOptions[dateFormatOptions.indexOf(
+                                        modState.format.name
+                                    )]
+                                }
                                 RadioGroup(
                                     options = dateFormatOptions,
                                     selectedOption = selectedDateFormat,
                                     onSelectedChange = onDateFormatSelected
                                 )
-                                fun () {
+                                fun() {
                                     modState.format = DateFormat.valueOf(selectedDateFormat)
                                 }
                             }
                             is UIModule.Value.UnitizedDouble -> {
                                 Text(text = "Unit Options")
                                 val doubleUnitOptions = DoubleUnit.values().map { it.name }
-                                val (selectedDoubleUnit, onDoubleUnitSelected) = state { doubleUnitOptions[doubleUnitOptions.indexOf(modState.unit.name)] }
+                                val (selectedDoubleUnit, onDoubleUnitSelected) = state {
+                                    doubleUnitOptions[doubleUnitOptions.indexOf(
+                                        modState.unit.name
+                                    )]
+                                }
                                 RadioGroup(
                                     options = doubleUnitOptions,
                                     selectedOption = selectedDoubleUnit,
                                     onSelectedChange = onDoubleUnitSelected
                                 )
-                                fun () {
+                                fun() {
                                     modState.unit = DoubleUnit.valueOf(selectedDoubleUnit)
                                 }
                             }
-                            else -> { fun () = Unit }
+                            else -> {
+                                fun() = Unit
+                            }
                         }
                         Button(
                             text = { Text("Apply") },

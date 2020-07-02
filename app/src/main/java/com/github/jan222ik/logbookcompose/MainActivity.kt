@@ -1,6 +1,7 @@
 package com.github.jan222ik.logbookcompose
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.Providers
 import androidx.ui.core.setContent
@@ -25,7 +26,9 @@ class MainActivity : AppCompatActivity() {
         val data = Demo.demoData()
         val serializer = ModuleSerializer(applicationContext)
         setContent {
-            val module = serializer.loadModule() ?: Demo.demoModule()
+            val loadModule = serializer.loadModule()
+            notifyActionResult("Loading", loadModule != null)
+            val module = loadModule ?: Demo.demoModule()
             LogbookComposeTheme(darkTheme = true) {
                 Scaffold(
                     bodyContent = {
@@ -35,7 +38,11 @@ class MainActivity : AppCompatActivity() {
                                     is Routing.Menu -> Menu(
                                         module = module,
                                         backStack = backStack,
-                                        executeSave = { serializer.saveModule(it) }
+                                        executeSave = {
+                                            serializer.saveModule(it).also { b ->
+                                                notifyActionResult("Saving", b)
+                                            }
+                                        }
                                     )
                                     is Routing.Display -> Display(
                                         module = current.module,
@@ -52,6 +59,14 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private fun notifyActionResult(what: String, success: Boolean) {
+        Toast.makeText(
+            this,
+            "$what ${if (success) "was successful" else "failed"}!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onBackPressed() {
