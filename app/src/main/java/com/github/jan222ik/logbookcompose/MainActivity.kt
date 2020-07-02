@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.Providers
+import androidx.compose.state
 import androidx.ui.core.setContent
 import androidx.ui.material.Scaffold
 import com.github.jan222ik.logbookcompose.data.Demo
@@ -26,10 +27,15 @@ class MainActivity : AppCompatActivity() {
         val data = Demo.demoData()
         val serializer = ModuleSerializer(applicationContext)
         setContent {
-            val loadModule = serializer.loadModule()
-            notifyActionResult("Loading", loadModule != null)
-            val module = loadModule ?: Demo.demoModule()
-            LogbookComposeTheme(darkTheme = true) {
+            val currentDefinitionState = state<String?> { null }
+            val (currentDefinition, setCurrentDefinition) = currentDefinitionState
+            val existingDefinitions = serializer.listDefinitions()
+            val modState = state { (if (existingDefinitions.isNotEmpty()) {
+                val fileName = existingDefinitions[0]
+                serializer.loadModule(fileName).also { setCurrentDefinition(existingDefinitions[0]) }
+            } else null).also { notifyActionResult("Loading", it != null) } ?: Demo.demoModule()}
+            val (module, setModule) = modState
+                LogbookComposeTheme(darkTheme = true) {
                 Scaffold(
                     bodyContent = {
                         Providers(AmbientBackPressHandler provides backPressHandler) {
@@ -38,11 +44,22 @@ class MainActivity : AppCompatActivity() {
                                     is Routing.Menu -> Menu(
                                         module = module,
                                         backStack = backStack,
-                                        executeSave = {
-                                            serializer.saveModule(it).also { b ->
+                                        executeSave = { it, saveName ->
+                                            serializer.saveModule(it, saveName).also { b ->
                                                 notifyActionResult("Saving", b)
                                             }
-                                        }
+                                        },
+                                        executeLoad = { saveName ->
+                                            if (existingDefinitions.contains(saveName)) {
+                                                val loaded = serializer.loadModule(saveName)
+                                                if (loaded != null) {
+                                                    setModule(loaded)
+                                                    setCurrentDefinition(saveName)
+                                                }
+                                            }
+                                        },
+                                        existingDefinitions = existingDefinitions,
+                                        currentDefinitionState = currentDefinitionState
                                     )
                                     is Routing.Display -> Display(
                                         module = current.module,
