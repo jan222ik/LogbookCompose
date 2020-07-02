@@ -1,13 +1,10 @@
-package com.github.jan222ik.logbookcompose.components
+package com.github.jan222ik.logbookcompose.pages.display
 
 import androidx.compose.Composable
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.Text
 import androidx.ui.layout.Column
-import androidx.ui.layout.Row
 import androidx.ui.layout.padding
-import androidx.ui.material.Card
-import androidx.ui.material.FilledTextField
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.dp
 import java.time.LocalDate
@@ -23,8 +20,14 @@ fun DateText(date: LocalDate, formatPattern: String = "dd-MM-yy") {
 fun MetricDatePreview() {
     Column {
         DateText(date = LocalDate.now())
-        DateText(date = LocalDate.now(), formatPattern = "dd-MM")
-        DateText(date = LocalDate.now(), formatPattern = "yyyy-MM")
+        DateText(
+            date = LocalDate.now(),
+            formatPattern = "dd-MM"
+        )
+        DateText(
+            date = LocalDate.now(),
+            formatPattern = "yyyy-MM"
+        )
     }
 }
 
@@ -38,8 +41,14 @@ fun IntegerText(value: Int, displayUnit: DisplayUnit = DisplayUnit.None) {
 fun IntegerTextPreview() {
     Column {
         IntegerText(value = 19)
-        IntegerText(value = 19, displayUnit = DisplayUnit.Meter)
-        IntegerText(value = 19, displayUnit = DisplayUnit.CentiMeter)
+        IntegerText(
+            value = 19,
+            displayUnit = DisplayUnit.Meter
+        )
+        IntegerText(
+            value = 19,
+            displayUnit = DisplayUnit.CentiMeter
+        )
     }
 }
 
@@ -53,8 +62,14 @@ fun DoubleText(value: Double, displayUnit: DisplayUnit = DisplayUnit.None) {
 fun DoubleTextPreview() {
     Column {
         DoubleText(value = 19.3)
-        DoubleText(value = 19.3, displayUnit = DisplayUnit.Meter)
-        DoubleText(value = 19.3, displayUnit = DisplayUnit.CentiMeter)
+        DoubleText(
+            value = 19.3,
+            displayUnit = DisplayUnit.Meter
+        )
+        DoubleText(
+            value = 19.3,
+            displayUnit = DisplayUnit.CentiMeter
+        )
     }
 }
 
