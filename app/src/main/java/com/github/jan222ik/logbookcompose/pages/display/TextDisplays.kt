@@ -7,6 +7,7 @@ import androidx.ui.layout.Column
 import androidx.ui.layout.padding
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.dp
+import com.github.jan222ik.logbookcompose.logic.DoubleUnit
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -53,7 +54,7 @@ fun IntegerTextPreview() {
 }
 
 @Composable
-fun DoubleText(value: Double, displayUnit: DisplayUnit = DisplayUnit.None) {
+fun DoubleText(value: Double, displayUnit: DoubleUnit = DoubleUnit.NONE) {
     Text(modifier = Modifier.padding(5.dp), text = "$value ${displayUnit.unitName}")
 }
 
@@ -64,11 +65,11 @@ fun DoubleTextPreview() {
         DoubleText(value = 19.3)
         DoubleText(
             value = 19.3,
-            displayUnit = DisplayUnit.Meter
+            displayUnit = DoubleUnit.METER
         )
         DoubleText(
             value = 19.3,
-            displayUnit = DisplayUnit.CentiMeter
+            displayUnit = DoubleUnit.CENTIMETER
         )
     }
 }

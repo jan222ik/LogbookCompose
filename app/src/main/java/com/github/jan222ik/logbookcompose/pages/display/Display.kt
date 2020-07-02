@@ -29,7 +29,7 @@ fun UIModuleProcessor(UIModule: UIModule, data: DiveData) {
             layModule = UIModule,
             data = data
         )
-        is UIModule.Value -> CardModule(
+        is UIModule.Value<*> -> CardModule(
             valModule = UIModule,
             data = data
         )
@@ -37,35 +37,29 @@ fun UIModuleProcessor(UIModule: UIModule, data: DiveData) {
 }
 
 @Composable
-fun TextDisplaysOf(valModule: UIModule.Value, data: DiveData) {
+fun TextDisplaysOf(valModule: UIModule.Value<*>, data: DiveData) {
     when (valModule) {
-        is UIModule.Value.DiveNumber -> IntegerText(
-            value = data.diveNumber
+        is UIModule.Value.Text -> Text(
+            text = valModule.value(data),
+            modifier = Modifier.padding(5.dp)
         )
         is UIModule.Value.Date -> DateText(
-            date = data.date
-        )
-        is UIModule.Value.DepthMAX -> DoubleText(
-            value = data.depthMAX,
-            displayUnit = DisplayUnit.Meter
-        )
-        is UIModule.Value.DepthAVG -> DoubleText(
-            value = data.depthAVG,
-            displayUnit = DisplayUnit.Meter
+            date = valModule.value(data),
+            formatPattern = valModule.format.pattern
         )
         is UIModule.Value.Duration -> IntegerText(
-            value = data.duration,
+            value = valModule.value(data),
             displayUnit = DisplayUnit.Minutes
         )
-        is UIModule.Value.SpotName -> Text(
-            text = data.spotname,
-            modifier = Modifier.padding(5.dp)
+        is UIModule.Value.UnitizedDouble -> DoubleText(
+            value = valModule.value(data),
+            displayUnit = valModule.unit
         )
     }
 }
 
 @Composable
-fun CardModule(valModule: UIModule.Value, data: DiveData) {
+fun CardModule(valModule: UIModule.Value<*>, data: DiveData) {
     Card {
         Row {
             Text(text = valModule.labelText, modifier = Modifier.padding(5.dp))

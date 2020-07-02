@@ -19,6 +19,8 @@ import androidx.ui.material.icons.rounded.EditAttributes
 import androidx.ui.material.icons.rounded.PostAdd
 import androidx.ui.material.icons.rounded.Visibility
 import androidx.ui.unit.dp
+import com.github.jan222ik.logbookcompose.logic.DateFormat
+import com.github.jan222ik.logbookcompose.logic.DoubleUnit
 import com.github.jan222ik.logbookcompose.logic.Routing
 import com.github.jan222ik.logbookcompose.logic.UIModule
 import com.github.zsoltk.compose.router.BackStack
@@ -45,13 +47,13 @@ enum class PopupStates {
     NONE, LAYOUT_ADD, LAYOUT_MODIFIERS, VALUE_MODIFIERS, VALUE_SELECT_TYPE
 }
 
-enum class ValueModuleNames(val displayName: String, val generator: () -> UIModule.Value) {
-    DiveNumber("Number of Dive", { UIModule.Value.DiveNumber() }),
+enum class ValueModuleNames(val displayName: String, val generator: () -> UIModule.Value<*>) {
+    DiveNumber("Number of Dive", { UIModule.Value.Text.DiveNumber() }),
     Date("Date", { UIModule.Value.Date() }),
     Duration("Duration", { UIModule.Value.Duration() }),
-    DepthMAX("Maximum Depth", { UIModule.Value.DepthMAX() }),
-    DepthAVG("Average Depth", { UIModule.Value.DepthAVG() }),
-    SpotName("Spotname", { UIModule.Value.SpotName() })
+    DepthMAX("Maximum Depth", { UIModule.Value.UnitizedDouble.DepthMAX() }),
+    DepthAVG("Average Depth", { UIModule.Value.UnitizedDouble.DepthAVG() }),
+    SpotName("Spotname", { UIModule.Value.Text.SpotName() })
 }
 
 private fun fromDisplayName(searchFor: String) =
@@ -89,11 +91,13 @@ fun createBuilderTreeFromModule(
                     IconButton(
                         modifier = iconButtonModifier,
                         icon = { Icon(icons.Visibility) },
-                        onClick = { backStack.push(
-                            Routing.Display(
-                                modState
+                        onClick = {
+                            backStack.push(
+                                Routing.Display(
+                                    modState
+                                )
                             )
-                        ) })
+                        })
                     when (modState) {
                         is UIModule.Layout.Column -> Text(
                             "Column",
@@ -235,19 +239,19 @@ fun createBuilderTreeFromModule(
             }
         }
     } else {
-        val (modState, _) = state { module as UIModule.Value }
+        val (modState, _) = state { module as UIModule.Value<*> }
         Row(
             modifier = Modifier.gravity(align = Alignment.Start),
             verticalGravity = Alignment.CenterVertically
         ) {
             Text("Metric: ")
             when (modState) {
-                is UIModule.Value.DiveNumber -> Text(text = "Number of Dive")
+                is UIModule.Value.Text.DiveNumber -> Text(text = "Number of Dive")
                 is UIModule.Value.Date -> Text(text = "Date")
-                is UIModule.Value.DepthMAX -> Text(text = "Max Depth")
-                is UIModule.Value.DepthAVG -> Text(text = "AVG Depth")
+                is UIModule.Value.UnitizedDouble.DepthMAX -> Text(text = "Max Depth")
+                is UIModule.Value.UnitizedDouble.DepthAVG -> Text(text = "AVG Depth")
                 is UIModule.Value.Duration -> Text(text = "Duration")
-                is UIModule.Value.SpotName -> Text(text = "Spotname")
+                is UIModule.Value.Text.SpotName -> Text(text = "Spotname")
             }
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                 IconButton(
@@ -277,14 +281,57 @@ fun createBuilderTreeFromModule(
                             onValueChange = { setLabelLocal(it) },
                             label = { Text("Text of Label") }
                         )
-                    }
-                    Button(
-                        text = { Text("Apply") },
-                        onClick = {
-                            modState.labelText = labelLocal; setShowAlert(PopupStates.NONE)
+                        val onSaveHandle: () -> Unit = when (modState) {
+                            is UIModule.Value.Date -> {
+                                Text(text = "Date Formats")
+                                val dateFormatOptions = DateFormat.values().map { it.name }
+                                val (selectedDateFormat, onDateFormatSelected) = state { dateFormatOptions[dateFormatOptions.indexOf(modState.format.name)] }
+                                RadioGroup(
+                                    options = dateFormatOptions,
+                                    selectedOption = selectedDateFormat,
+                                    onSelectedChange = onDateFormatSelected
+                                )
+                                fun () {
+                                    modState.format = DateFormat.valueOf(selectedDateFormat)
+                                }
+                            }
+                            is UIModule.Value.UnitizedDouble -> {
+                                Text(text = "Unit Options")
+                                val doubleUnitOptions = DoubleUnit.values().map { it.name }
+                                val (selectedDoubleUnit, onDoubleUnitSelected) = state { doubleUnitOptions[doubleUnitOptions.indexOf(modState.unit.name)] }
+                                RadioGroup(
+                                    options = doubleUnitOptions,
+                                    selectedOption = selectedDoubleUnit,
+                                    onSelectedChange = onDoubleUnitSelected
+                                )
+                                fun () {
+                                    modState.unit = DoubleUnit.valueOf(selectedDoubleUnit)
+                                }
+                            }
+                            else -> { fun () = Unit }
                         }
-                    )
-                })
+                        Button(
+                            text = { Text("Apply") },
+                            onClick = {
+                                modState.labelText = labelLocal;
+                                onSaveHandle()
+                                setShowAlert(PopupStates.NONE)
+                            }
+                        )
+                    }
+                }
+            )
         }
     }
+}
+
+@Composable
+fun DateFormatRadioGroup() {
+    val dateFormatOptions = DateFormat.values().map { it.name }
+    val (selectedDateFormat, onDateFormatSelected) = state { dateFormatOptions[0] }
+    RadioGroup(
+        options = dateFormatOptions,
+        selectedOption = selectedDateFormat,
+        onSelectedChange = onDateFormatSelected
+    )
 }
