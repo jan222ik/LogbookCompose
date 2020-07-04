@@ -18,17 +18,29 @@ object Demo {
     fun demoModule(): UIModule.Layout {
         return UIModule.Layout.Column(
             children = mutableListOf(
-                UIModule.Value.Text.DiveNumber(labelText = "No:"),
-                UIModule.Value.Date(),
                 UIModule.Layout.Row(
                     children = mutableListOf(
-                        UIModule.Value.Duration(),
+                        UIModule.Value.Text.DiveNumber(labelText = "No:"),
+                        UIModule.Value.Text.SpotName()
+                    ),
+                    modifier = ModuleModifier.Layout.Row(scrollable = true, onCard = true)
+                ),
+                UIModule.Layout.Row(
+                    children = mutableListOf(
+                        UIModule.Value.Date(),
+                        UIModule.Value.Duration()
+                    ),
+                    modifier = ModuleModifier.Layout.Row(scrollable = true, onCard = true)
+                ),
+                UIModule.Layout.Row(
+                    children = mutableListOf(
                         UIModule.Value.UnitizedDouble.DepthMAX(),
                         UIModule.Value.UnitizedDouble.DepthAVG()
                     ),
                     modifier = ModuleModifier.Layout.Row(scrollable = true)
                 )
-            )
+            ),
+            modifier = ModuleModifier.Layout.Column(onCard = false)
         )
     }
 }

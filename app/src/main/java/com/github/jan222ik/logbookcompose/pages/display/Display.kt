@@ -9,17 +9,23 @@ import androidx.ui.layout.Row
 import androidx.ui.layout.fillMaxWidth
 import androidx.ui.layout.padding
 import androidx.ui.material.Card
+import androidx.ui.material.Divider
+import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.dp
+import com.github.jan222ik.logbookcompose.data.Demo
 import com.github.jan222ik.logbookcompose.data.DiveData
 import com.github.jan222ik.logbookcompose.logic.UIModule
 
 @Composable
 fun Display(module: UIModule, data: DiveData) {
-    Text("Display")
-    UIModuleProcessor(
-        UIModule = module,
-        data = data
-    )
+    Column {
+        Text("Display")
+        Divider()
+        UIModuleProcessor(
+            UIModule = module,
+            data = data
+        )
+    }
 }
 
 @Composable
@@ -60,7 +66,10 @@ fun TextDisplaysOf(valModule: UIModule.Value<*>, data: DiveData) {
 
 @Composable
 fun CardModule(valModule: UIModule.Value<*>, data: DiveData) {
-    Card {
+    Card(
+        elevation = 10.dp,
+        modifier = Modifier.padding(3.dp)
+    ) {
         Row {
             Text(text = valModule.labelText, modifier = Modifier.padding(5.dp))
             TextDisplaysOf(
@@ -69,6 +78,12 @@ fun CardModule(valModule: UIModule.Value<*>, data: DiveData) {
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun preview() {
+    ApplyLayoutModule(layModule = Demo.demoModule(), data = Demo.demoData())
 }
 
 @Composable
@@ -82,13 +97,29 @@ fun ApplyLayoutModule(layModule: UIModule.Layout, data: DiveData) {
         }
     }
     when (layModule) {
-        is UIModule.Layout.Column -> Column {
-            processChildren(layModule.children)
-        }
+        is UIModule.Layout.Column ->
+            if (layModule.modifier.onCard) {
+                Card {
+                    Column { processChildren(layModule.children) }
+                }
+            } else Column { processChildren(layModule.children) }
+
         is UIModule.Layout.Row -> {
-            if (layModule.modifier.scrollable) {
-                HorizontalScroller { processChildren(layModule.children) }
-            } else Row { processChildren(layModule.children) }
+            if (layModule.modifier.onCard) {
+                Card {
+                    if (layModule.modifier.scrollable) {
+                        HorizontalScroller {
+                            processChildren(layModule.children)
+                        }
+                    } else Row { processChildren(layModule.children) }
+                }
+            } else {
+                if (layModule.modifier.scrollable) {
+                    HorizontalScroller {
+                        processChildren(layModule.children)
+                    }
+                } else Row { processChildren(layModule.children) }
+            }
         }
         is UIModule.Layout.HorizontalTPiece -> Row(modifier = Modifier.fillMaxWidth()) {
             UIModuleProcessor(

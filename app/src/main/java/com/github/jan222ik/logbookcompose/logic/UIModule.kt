@@ -6,10 +6,12 @@ import java.io.Serializable as S
 
 
 sealed class UIModule : S {
-    sealed class Layout(open val children: MutableList<UIModule>) :
-        UIModule(), S {
+    sealed class Layout(
+        open val children: MutableList<UIModule>
+    ) : UIModule(), S {
         data class Column(
-            override val children: MutableList<UIModule>
+            override val children: MutableList<UIModule>,
+            val modifier: ModuleModifier.Layout.Column = ModuleModifier.Layout.Column()
         ) : Layout(children), S
 
         data class Row(
@@ -24,7 +26,9 @@ sealed class UIModule : S {
         ) : Layout(mutableListOf(large, topSmall, bottomSmall)), S
     }
 
-    sealed class Value<T>(open var labelText: String) : UIModule(), S {
+    sealed class Value<T>(
+        open var labelText: String
+    ) : UIModule(), S {
         abstract fun value(data: DiveData): T
 
         sealed class Text(override var labelText: String) : Value<String>(labelText), S {
@@ -38,13 +42,16 @@ sealed class UIModule : S {
             }
         }
 
-        data class Date(override var labelText: String = "Date:", var format: DateFormat = DateFormat.ddMMYYDashed) : Value<LocalDate>(labelText), S {
-
+        data class Date(
+            override var labelText: String = "Date:",
+            var format: DateFormat = DateFormat.ddMMYYDashed
+        ) : Value<LocalDate>(labelText), S {
             override fun value(data: DiveData): LocalDate = data.date
         }
 
-        data class Duration(override var labelText: String = "Duration:") : Value<Int>(labelText),
-            S {
+        data class Duration(
+            override var labelText: String = "Duration:"
+        ) : Value<Int>(labelText), S {
             override fun value(data: DiveData): Int = data.duration
         }
 
@@ -53,13 +60,15 @@ sealed class UIModule : S {
             open var unit: DoubleUnit = DoubleUnit.NONE
         ) : Value<Double>(labelText), S {
 
-            data class DepthMAX(override var labelText: String = "Maximum Depth:") :
-                UnitizedDouble(labelText, DoubleUnit.METER), S {
+            data class DepthMAX(
+                override var labelText: String = "Maximum Depth:"
+            ) : UnitizedDouble(labelText, DoubleUnit.METER), S {
                 override fun value(data: DiveData): Double = data.depthMAX
             }
 
-            data class DepthAVG(override var labelText: String = "Average Depth") :
-                UnitizedDouble(labelText, DoubleUnit.METER), S {
+            data class DepthAVG(
+                override var labelText: String = "Average Depth"
+            ) : UnitizedDouble(labelText, DoubleUnit.METER), S {
                 override fun value(data: DiveData): Double = data.depthAVG
             }
         }
@@ -76,6 +85,13 @@ enum class DateFormat(val pattern: String) {
 
 sealed class ModuleModifier : S {
     sealed class Layout : ModuleModifier(), S {
-        data class Row(var scrollable: Boolean = false) : Layout(), S
+        data class Row(
+            var scrollable: Boolean = false,
+            var onCard: Boolean = false
+        ) : Layout(), S
+
+        data class Column(
+            var onCard: Boolean = false
+        ) : Layout(), S
     }
 }

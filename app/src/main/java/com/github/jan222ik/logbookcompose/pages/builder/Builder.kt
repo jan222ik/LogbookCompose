@@ -137,7 +137,8 @@ fun createBuilderTreeFromModule(
                     }
                 }
                 if (showAlert == PopupStates.LAYOUT_MODIFIERS && modState is UIModule.Layout.Row) {
-                    val (temp, setTemp) = state { modState.modifier.scrollable }
+                    val (scrollable, setScrollable) = state { modState.modifier.scrollable }
+                    val (onCard, setOnCard) = state { modState.modifier.onCard }
                     AlertDialog(
                         onCloseRequest = { setShowAlert(PopupStates.NONE) },
                         text = { Text("Choose a Element") },
@@ -145,11 +146,20 @@ fun createBuilderTreeFromModule(
                             Column {
                                 Text("Scrollable")
                                 Checkbox(
-                                    checked = temp,
+                                    checked = scrollable,
                                     onCheckedChange = {
                                         val b = !modState.modifier.scrollable
                                         modState.modifier.scrollable = b
-                                        setTemp(b)
+                                        setScrollable(b)
+                                    }
+                                )
+                                Text("Render on Card")
+                                Checkbox(
+                                    checked = onCard,
+                                    onCheckedChange = {
+                                        val b = !modState.modifier.onCard
+                                        modState.modifier.onCard = b
+                                        setOnCard(b)
                                     }
                                 )
                             }
