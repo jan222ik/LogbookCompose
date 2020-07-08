@@ -108,14 +108,14 @@ fun ApplyLayoutModule(layModule: UIModule.Layout, data: DiveData) {
             if (layModule.modifier.onCard) {
                 Card {
                     if (layModule.modifier.scrollable) {
-                        HorizontalScroller {
+                        Row {
                             processChildren(layModule.children)
                         }
                     } else Row { processChildren(layModule.children) }
                 }
             } else {
                 if (layModule.modifier.scrollable) {
-                    HorizontalScroller {
+                    Row {
                         processChildren(layModule.children)
                     }
                 } else Row { processChildren(layModule.children) }
