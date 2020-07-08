@@ -1,18 +1,17 @@
 package com.github.jan222ik.logbookcompose.logic
 
 import android.content.Context
-import java.io.FilenameFilter
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
 class ModuleSerializer(private val context: Context) {
-    private val fileType = ".cb"
+    private val fileExtension = ".cb"
 
     fun listDefinitions(): List<String> =
-        context.dataDir.listFiles()[2].listFiles().filter{file -> file != null && file.extension == "cb" }.map { it.name.removeSuffix(fileType) }
+        context.dataDir.listFiles()[2].listFiles().filter{file -> file != null && file.extension == "cb" }.map { it.name.removeSuffix(fileExtension) }
 
     fun loadModule(fileName: String): UIModule.Layout? = try {
-        ObjectInputStream(context.openFileInput(fileName + fileType))
+        ObjectInputStream(context.openFileInput(fileName + fileExtension))
             .use {
                 it.readObject() as UIModule.Layout
             }
@@ -22,7 +21,7 @@ class ModuleSerializer(private val context: Context) {
     }
 
     fun saveModule(module: UIModule.Layout, fileName: String): Boolean = try {
-        ObjectOutputStream(context.openFileOutput(fileName + fileType, Context.MODE_PRIVATE))
+        ObjectOutputStream(context.openFileOutput(fileName + fileExtension, Context.MODE_PRIVATE))
             .use {
                 it.writeObject(module)
             }

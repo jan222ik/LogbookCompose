@@ -20,9 +20,9 @@ sealed class UIModule : S {
         ) : Layout(children), S
 
         data class HorizontalTPiece(
-            var large: UIModule,
-            var topSmall: UIModule,
-            var bottomSmall: UIModule
+            var large: Value<*>,
+            var topSmall: Value<*>,
+            var bottomSmall: Value<*>
         ) : Layout(mutableListOf(large, topSmall, bottomSmall)), S
     }
 
@@ -75,11 +75,11 @@ sealed class UIModule : S {
     }
 }
 
-enum class DoubleUnit(val unitName: String) {
+enum class DoubleUnit(val unitName: String): S  {
     NONE(""), METER("m"), CENTIMETER("cm")
 }
 
-enum class DateFormat(val pattern: String) {
+enum class DateFormat(val pattern: String): S {
     ddMMYYDashed("dd-MM-YY"), MMddYYDashed("MM-dd-YY"), yyyyMMddDashed("yyyy-MM-dd")
 }
 

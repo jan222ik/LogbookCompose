@@ -43,4 +43,16 @@ object Demo {
             modifier = ModuleModifier.Layout.Column(onCard = false)
         )
     }
+
+    fun demoModuleA(): UIModule.Layout {
+        return UIModule.Layout.Column(children = mutableListOf(
+            UIModule.Value.Text.DiveNumber(labelText = "No:"),
+            UIModule.Value.Date(),
+            UIModule.Layout.Row(children = mutableListOf(
+                UIModule.Value.Duration(),
+                UIModule.Value.UnitizedDouble.DepthMAX(),
+                UIModule.Value.UnitizedDouble.DepthAVG()
+            ))
+        ))
+    }
 }
